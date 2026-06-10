@@ -206,7 +206,7 @@ export default function App() {
       catch { setSyncMsg("Save failed"); }
       setSyncing(false);
     }, 1500);
-  },[data]);
+  },[data, auth]);
 
   if (!auth) return <AuthScreen onAuth={setAuth}/>;
 
