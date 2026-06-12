@@ -288,6 +288,31 @@ export default function App() {
   const todayStudy = data.studyLog[today]||0;
   const goalPct    = Math.min(100,Math.round(todayStudy/data.dailyGoal*100));
 
+  // u2500u2500 Study Streak u2500u2500
+  function calcStreak(){
+    let streak=0;
+    const d=new Date();
+    d.setDate(d.getDate()-1);
+    while(true){
+      const key=d.toISOString().split("T")[0];
+      if((data.studyLog[key]||0)>0){streak++;d.setDate(d.getDate()-1);}
+      else break;
+    }
+    if((data.studyLog[today]||0)>0) streak++;
+    return streak;
+  }
+  function daysTo(dateStr){
+    const target=new Date(dateStr);
+    const now=new Date();
+    now.setHours(0,0,0,0);
+    return Math.ceil((target-now)/(1000*60*60*24));
+  }
+  const JEE_MAINS_1  = data.examDates?.mainsSession1  || "2027-01-20";
+  const JEE_MAINS_2  = data.examDates?.mainsSession2  || "2027-04-01";
+  const JEE_ADVANCED = data.examDates?.advanced        || "2027-05-23";
+  const BOARDS       = data.examDates?.boards          || "2027-02-15";
+  const streak = calcStreak();
+
   const TABS=[
     {id:"dashboard",label:"📊 Dashboard"},
     {id:"chapters", label:"📚 Chapters"},
@@ -357,6 +382,42 @@ export default function App() {
               </div>
               <div style={S.pbBg}><div style={{...S.pb,width:`${goalPct}%`,background:"linear-gradient(90deg,#845EF7,#00C9A7)"}}/></div>
               <div style={{fontSize:"10px",color:"#444",marginTop:"4px"}}>{goalPct}% of {data.dailyGoal}h daily goal</div>
+            </div>
+
+
+            {/* Streak + Countdown */}
+            <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(200px,1fr))",gap:"10px"}}>
+              {/* Study Streak */}
+              <div style={{...S.card,borderColor:"#FFB34733",background:"linear-gradient(135deg,#1a1200,#0d0d1a)"}}>
+                <div style={{fontSize:"10px",color:"#FFB347",letterSpacing:"1px",marginBottom:"6px"}}>🔥 STUDY STREAK</div>
+                <div style={{fontFamily:"'Syne',sans-serif",fontWeight:800,fontSize:"36px",color:streak>=7?"#FFB347":streak>=3?"#FF6B35":"#666"}}>{streak}</div>
+                <div style={{fontSize:"11px",color:"#555",marginTop:"2px"}}>day{streak!==1?"s":""} in a row</div>
+                <div style={{fontSize:"10px",color:"#333",marginTop:"4px"}}>
+                  {streak===0?"Start studying today to build your streak!":streak>=7?"🏆 Amazing consistency! Keep it up!":streak>=3?"💪 Great streak! Don't break it!":"Keep going! Aim for 7 days!"}
+                </div>
+              </div>
+              {/* Countdown cards */}
+              <div style={{...S.card,borderColor:"#845EF733"}}>
+                <div style={{fontSize:"10px",color:"#845EF7",letterSpacing:"1px",marginBottom:"8px"}}>📅 EXAM COUNTDOWN</div>
+                <div style={{display:"flex",flexDirection:"column",gap:"6px"}}>
+                  {[
+                    {label:"JEE Mains S1", date:JEE_MAINS_1,  color:"#FF6B35"},
+                    {label:"JEE Mains S2", date:JEE_MAINS_2,  color:"#FFB347"},
+                    {label:"JEE Advanced", date:JEE_ADVANCED, color:"#845EF7"},
+                    {label:"Boards",       date:BOARDS,        color:"#00C9A7"},
+                  ].map(e=>{
+                    const d=daysTo(e.date);
+                    return (
+                      <div key={e.label} style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"5px 8px",background:"#07070f",borderRadius:"6px",border:`1px solid ${e.color}22`}}>
+                        <span style={{fontSize:"11px",color:"#888"}}>{e.label}</span>
+                        <span style={{fontFamily:"'Syne',sans-serif",fontWeight:800,fontSize:"14px",color:d<=30?e.color:d<=90?"#FFB347":"#555"}}>
+                          {d>0?`${d}d`:"Today!"}
+                        </span>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
             </div>
 
             {/* Subject cards */}
