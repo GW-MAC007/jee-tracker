@@ -397,28 +397,55 @@ export default function App() {
                 </div>
               </div>
               {/* Countdown cards */}
-              <div style={{...S.card,borderColor:"#845EF733"}}>
-                <div style={{fontSize:"10px",color:"#845EF7",letterSpacing:"1px",marginBottom:"8px"}}>📅 EXAM COUNTDOWN</div>
-                <div style={{display:"flex",flexDirection:"column",gap:"6px"}}>
-                  {[
-                    {label:"JEE Mains S1", date:JEE_MAINS_1,  color:"#FF6B35"},
-                    {label:"JEE Mains S2", date:JEE_MAINS_2,  color:"#FFB347"},
-                    {label:"JEE Advanced", date:JEE_ADVANCED, color:"#845EF7"},
-                    {label:"Boards",       date:BOARDS,        color:"#00C9A7"},
-                  ].map(e=>{
-                    const d=daysTo(e.date);
-                    return (
-                      <div key={e.label} style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"5px 8px",background:"#07070f",borderRadius:"6px",border:`1px solid ${e.color}22`}}>
-                        <span style={{fontSize:"11px",color:"#888"}}>{e.label}</span>
-                        <span style={{fontFamily:"'Syne',sans-serif",fontWeight:800,fontSize:"14px",color:d<=30?e.color:d<=90?"#FFB347":"#555"}}>
-                          {d>0?`${d}d`:"Today!"}
-                        </span>
+              <div style={{...S.card,borderColor:"#845EF733",display:"flex",flexDirection:"column",gap:"8px"}}>
+                <div style={{fontSize:"10px",color:"#845EF7",letterSpacing:"1px"}}>📅 EXAM COUNTDOWN</div>
+                {[
+                  {label:"JEE Mains S1", date:JEE_MAINS_1,  color:"#FF6B35", icon:"⚡"},
+                  {label:"JEE Mains S2", date:JEE_MAINS_2,  color:"#FFB347", icon:"🎯"},
+                  {label:"JEE Advanced", date:JEE_ADVANCED, color:"#845EF7", icon:"🏆"},
+                  {label:"Boards",       date:BOARDS,        color:"#00C9A7", icon:"📋"},
+                ].map(e=>{
+                  const d=daysTo(e.date);
+                  const pct=Math.max(0,Math.min(100,Math.round((1-d/600)*100)));
+                  const urgency=d<=30?"#FF4444":d<=90?"#FF6B35":d<=180?"#FFB347":"#555";
+                  const msg=d<=30?"⚠️ URGENT — Final sprint!":d<=90?"🔥 Getting close — push harder!":d<=180?"📈 Mid-prep — stay consistent!":"🌱 Early days — build strong habits!";
+                  return (
+                    <div key={e.label} style={{background:"#07070f",borderRadius:"8px",padding:"8px 10px",border:`1px solid ${e.color}33`}}>
+                      <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:"5px"}}>
+                        <span style={{fontSize:"11px",color:"#aaa",fontWeight:700}}>{e.icon} {e.label}</span>
+                        <div style={{textAlign:"right"}}>
+                          <span style={{fontFamily:"'Syne',sans-serif",fontWeight:800,fontSize:"18px",color:d<=90?e.color:"#666"}}>{d>0?d:"0"}</span>
+                          <span style={{fontSize:"10px",color:"#444"}}> days</span>
+                        </div>
                       </div>
-                    );
-                  })}
-                </div>
+                      <div style={{...S.pbBg,marginBottom:"4px"}}>
+                        <div style={{...S.pb,width:`${pct}%`,background:`linear-gradient(90deg,${e.color},${e.color}88)`}}/>
+                      </div>
+                      <div style={{fontSize:"9px",color:urgency,letterSpacing:"0.3px"}}>{msg}</div>
+                    </div>
+                  );
+                })}
               </div>
             </div>
+
+            {/* Motivational Banner */}
+            {(()=>{
+              const d=daysTo(JEE_ADVANCED);
+              const quotes=[
+                {max:30,  text:"The last 30 days separate toppers from the rest. Every hour counts now.", color:"#FF4444"},
+                {max:90,  text:"You are in the final stretch. The rank you get will reflect exactly how hard you worked.", color:"#FF6B35"},
+                {max:180, text:"Half the battle is consistency. The students who make it to IIT study even when they don't feel like it.", color:"#FFB347"},
+                {max:365, text:"Every chapter you complete today is one less thing to worry about later. Start now.", color:"#845EF7"},
+                {max:9999,text:"You have time — but time flies. The earlier you start, the more confident you'll be on exam day.", color:"#00C9A7"},
+              ];
+              const q=quotes.find(q=>d<=q.max)||quotes[quotes.length-1];
+              return (
+                <div style={{background:"#07070f",border:`1px solid ${q.color}33`,borderLeft:`3px solid ${q.color}`,borderRadius:"8px",padding:"12px 16px"}}>
+                  <div style={{fontSize:"9px",color:q.color,letterSpacing:"1px",marginBottom:"5px"}}>💭 REALITY CHECK — {d} days to JEE Advanced</div>
+                  <div style={{fontSize:"12px",color:"#ccc",lineHeight:"1.6",fontStyle:"italic"}}>"{q.text}"</div>
+                </div>
+              );
+            })()}
 
             {/* Subject cards */}
             <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(200px,1fr))",gap:"10px"}}>
